@@ -1,11 +1,12 @@
-use bevy::asset::AsyncReadExt;
-use bevy::text::Font;
 use std::error::Error;
 use std::fmt::Display;
 
 use anyhow::Result;
-use bevy::asset::io::Reader;
-use bevy::asset::{Asset, AssetLoader, BoxedFuture, LoadContext};
+use bevy::asset::{
+    Asset, AssetLoader, AsyncReadExt, LoadContext,
+    io::Reader,
+};
+use bevy::utils::ConditionalSendFuture;
 use bevy::reflect::TypePath;
 
 #[derive(Debug)]
@@ -15,7 +16,7 @@ impl Error for FontLoaderError {}
 
 impl Display for FontLoaderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.to_string())
+        f.write_str("FontLoaderError")
     }
 }
 
@@ -23,7 +24,10 @@ impl Display for FontLoaderError {
 pub struct FontLoader;
 
 impl AssetLoader for FontLoader {
-    type Asset = Font;
+    /// Bevy doesn't allow multiple [`AssetLoader`]s for the same extension anymore.
+    /// So now we're returning our own type so Bevy can determine which loader to
+    /// use without binding an extension to our loader.
+    type Asset = TextMeshFont;
     type Settings = ();
     type Error = FontLoaderError;
 
@@ -31,8 +35,8 @@ impl AssetLoader for FontLoader {
         &'a self,
         reader: &'a mut Reader,
         _: &'a Self::Settings,
-        load_context: &'a mut LoadContext,
-    ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
+        _load_context: &'a mut LoadContext,
+    ) -> impl ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             let mut bytes = Vec::new();
             reader
@@ -46,16 +50,12 @@ impl AssetLoader for FontLoader {
                     .expect("unable to decode asset"),
             };
 
-            load_context.add_labeled_asset("mesh".into(), font);
-
-            let original_font = Font::try_from_bytes(bytes.into()).expect("unable to read font");
-
-            Ok(original_font)
+            Ok(font)
         })
     }
 
     fn extensions(&self) -> &[&str] {
-        &["ttf"]
+        &[]
     }
 }
 

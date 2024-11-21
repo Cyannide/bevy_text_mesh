@@ -32,7 +32,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             TextMeshPlugin,
-            FrameTimeDiagnosticsPlugin::default(),
+            FrameTimeDiagnosticsPlugin,
             LogDiagnosticsPlugin::default(),
         ))
         .register_diagnostic(Diagnostic::new(TEXT_MESH_UPDATES).with_max_history_length(20)) // , "text_mesh_updates", 20))
@@ -74,7 +74,7 @@ fn setup_text_mesh(
     asset_server: Res<AssetServer>,
 ) {
     let state = SceneState {
-        font: asset_server.load("fonts/FiraMono-Medium.ttf#mesh"),
+        font: asset_server.load("fonts/FiraMono-Medium.ttf"),
         text_count: 0,
         text_update_count: 0,
         material: materials.add(StandardMaterial {
@@ -90,7 +90,7 @@ fn setup_text_mesh(
                 text: String::from("FPS"),
                 style: TextMeshStyle {
                     font: state.font.clone(),
-                    color: Color::rgb(0., 1., 0.),
+                    color: Color::srgb(0., 1., 0.),
                     font_size: SizeUnit::NonStandard(48.),
                     ..Default::default()
                 },
@@ -108,7 +108,7 @@ fn setup_text_mesh(
                 style: TextMeshStyle {
                     font: state.font.clone(),
                     font_size: SizeUnit::NonStandard(18.),
-                    color: Color::rgb(1., 1., 1.),
+                    color: Color::srgb(1., 1., 1.),
                     ..Default::default()
                 },
                 ..Default::default()
@@ -193,7 +193,7 @@ fn update_text_mesh(
     let mut update_count = 0;
     if timer.text_update_timer.tick(time.delta()).just_finished() {
         for mut text_mesh in text_meshes.iter_mut() {
-            let updated_text = String::from(format!("Time = {:.3}", time.elapsed_seconds_f64()));
+            let updated_text = format!("Time = {:.3}", time.elapsed_seconds_f64());
 
             if text_mesh.text != updated_text {
                 text_mesh.text = updated_text;
@@ -245,7 +245,7 @@ fn update_frame_rate(
         }
 
         let camera_entity = camera_entity.iter().next().unwrap();
-        let camera_transform = transform_query.get_mut(camera_entity).unwrap().clone();
+        let camera_transform = *transform_query.get_mut(camera_entity).unwrap();
         let mut transform = transform_query.get_mut(text_mesh_entity).unwrap();
 
         // eh - why negative?
@@ -261,7 +261,7 @@ fn setup(
 ) {
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(5.0, 5.0))),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
+        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
         ..Default::default()
     });
     commands.spawn(PointLightBundle {

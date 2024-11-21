@@ -28,6 +28,8 @@ Consider this as a preview of the plugin for gathering feedback about the API:
 
 | bevy | bevy_text_mesh |
 | ---- | -------------- |
+| 0.14 | 0.11.0         |
+| 0.13 | 0.10.0         |
 | 0.12 | 0.9.0          |
 | 0.11 | 0.7.0          |
 | 0.10 | 0.6.0          |
@@ -62,7 +64,7 @@ Add to Cargo.toml:
 
 ```
 [dependencies]
-bevy_text_mesh = "0.9.0"
+bevy_text_mesh = "0.11.0"
 ```
 
 Include the library:
@@ -92,14 +94,14 @@ Next, you are ready to spawn a text in your scene at a system:
 First, load a font asset:
 
 ```rust
-let font: Handle<TextMeshFont> = asset_server.load("fonts/FiraSans-Medium.ttf#mesh");
+let font: Handle<TextMeshFont> = asset_server.load("fonts/FiraSans-Medium.ttf");
 ```
 
 Then, spawn a textmesh bundle:
 
 ```rust
 commands.spawn(TextMeshBundle {
-    text_mesh: TextMesh::new_with_color("Hello Bevy", font, Color::rgb(1., 1., 0.)),
+    text_mesh: TextMesh::new_with_color("Hello Bevy", font, Color::srgb(1., 1., 0.)),
     transform: Transform::from_xyz(-1., 1.75, 0.),
     ..Default::default()
 });
@@ -114,7 +116,7 @@ commands.spawn(TextMeshBundle {
         style: TextMeshStyle {
             font,
             font_size: SizeUnit::NonStandard(36.),
-            color: Color::rgb(1.0, 1.0, 0.0),
+            color: Color::srgb(1.0, 1.0, 0.0),
             font_style: FontStyle::UPPERCASE, // only UPPERCASE & LOWERCASE implemented currently
             mesh_quality: Quality::Low,
             ..Default::default()

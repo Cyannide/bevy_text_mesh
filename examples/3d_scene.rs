@@ -13,7 +13,7 @@ fn main() {
 }
 
 fn setup_text_mesh(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let font: Handle<TextMeshFont> = asset_server.load("fonts/FiraMono-Medium.ttf#mesh");
+    let font: Handle<TextMeshFont> = asset_server.load("fonts/FiraMono-Medium.ttf");
 
     commands.spawn(TextMeshBundle {
         text_mesh: TextMesh {
@@ -21,7 +21,7 @@ fn setup_text_mesh(mut commands: Commands, asset_server: Res<AssetServer>) {
             style: TextMeshStyle {
                 font: font.clone(),
                 font_size: SizeUnit::NonStandard(9.),
-                color: Color::rgb(0.0, 0.0, 0.0),
+                color: Color::srgb(0.0, 0.0, 0.0),
                 ..Default::default()
             },
             size: TextMeshSize {
@@ -43,7 +43,7 @@ fn setup_text_mesh(mut commands: Commands, asset_server: Res<AssetServer>) {
                 style: TextMeshStyle {
                     font: font.clone(),
                     font_size: SizeUnit::NonStandard(36.),
-                    color: Color::rgb(0.0, 1.0, 0.0),
+                    color: Color::srgb(0.0, 1.0, 0.0),
                     mesh_quality: Quality::Custom(128),
                     ..Default::default()
                 },
@@ -77,7 +77,7 @@ fn update_text_mesh(
 ) {
     if timer.timer.tick(time.delta()).just_finished() {
         for mut text_mesh in text_meshes.iter_mut() {
-            let updated_text = String::from(format!("Time = {:.3}", time.elapsed_seconds_f64()));
+            let updated_text = format!("Time = {:.3}", time.elapsed_seconds_f64());
 
             if text_mesh.text != updated_text {
                 text_mesh.text = updated_text;
@@ -110,14 +110,14 @@ fn setup(
 ) {
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(5.0, 5.0))),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
+        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
         ..Default::default()
     });
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(Cuboid {
             half_size: Vec3::new(1.0, 0.5, 1.0),
         })),
-        material: materials.add(Color::rgb(0.8, 0.7, 0.6)),
+        material: materials.add(Color::srgb(0.8, 0.7, 0.6)),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..Default::default()
     });

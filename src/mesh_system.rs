@@ -64,7 +64,7 @@ pub(crate) fn text_mesh(
             if let Some(asset_mesh) = meshes.get_mut(mesh) {
                 new_mesh = false;
                 let ttf2_mesh =
-                    generate_text_mesh(&text_mesh, &mut font.ttf_font, Some(&mut cache));
+                    generate_text_mesh(text_mesh, &mut font.ttf_font, Some(&mut cache));
                 apply_mesh(ttf2_mesh, asset_mesh);
             }
         }
@@ -75,19 +75,19 @@ pub(crate) fn text_mesh(
                 RenderAssetUsages::RENDER_WORLD,
             );
 
-            let ttf2_mesh = generate_text_mesh(&text_mesh, &mut font.ttf_font, Some(&mut cache));
+            let ttf2_mesh = generate_text_mesh(text_mesh, &mut font.ttf_font, Some(&mut cache));
             apply_mesh(ttf2_mesh, &mut mesh);
 
             commands.entity(entity).insert(PbrBundle {
                 mesh: meshes.add(mesh),
-                material: material.map(|m| m.clone()).unwrap_or_else(|| {
+                material: material.cloned().unwrap_or_else(|| {
                     materials.add(StandardMaterial {
                         base_color: text_mesh.style.color,
                         ..Default::default()
                     })
                 }),
-                transform: transform.clone(),
-                global_transform: global_transform.clone(),
+                transform: *transform,
+                global_transform: *global_transform,
                 ..Default::default()
             });
         }
