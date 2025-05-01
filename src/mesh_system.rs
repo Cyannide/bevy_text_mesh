@@ -17,9 +17,9 @@ pub(crate) fn text_mesh(
             Entity,
             &Transform,
             &GlobalTransform,
-            Option<&Handle<StandardMaterial>>,
+            Option<&MeshMaterial3d<StandardMaterial>>,
             &TextMesh,
-            Option<&Handle<Mesh>>,
+            Option<&Mesh3d>,
             &mut TextMeshState,
         ),
         Or<(Changed<TextMesh>, Changed<TextMeshState>)>,
@@ -78,18 +78,17 @@ pub(crate) fn text_mesh(
             let ttf2_mesh = generate_text_mesh(text_mesh, &mut font.ttf_font, Some(&mut cache));
             apply_mesh(ttf2_mesh, &mut mesh);
 
-            commands.entity(entity).insert(PbrBundle {
-                mesh: meshes.add(mesh),
-                material: material.cloned().unwrap_or_else(|| {
-                    materials.add(StandardMaterial {
+            commands.entity(entity).insert((
+                Mesh3d(meshes.add(mesh)),
+                material.cloned().unwrap_or_else(|| {
+                    MeshMaterial3d(materials.add(StandardMaterial {
                         base_color: text_mesh.style.color,
                         ..Default::default()
-                    })
+                    }))
                 }),
-                transform: *transform,
-                global_transform: *global_transform,
-                ..Default::default()
-            });
+                *transform,
+                *global_transform,
+            ));
         }
     }
 }

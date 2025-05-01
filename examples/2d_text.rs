@@ -14,28 +14,29 @@ struct AnimateRotation;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/FiraMono-Medium.ttf");
-    let text_style = TextStyle {
-        font,
+    let text_font = TextFont {
+        font: font.clone(),
         font_size: 60.0,
-        color: Color::WHITE,
+        ..default()
     };
     let text_alignment = JustifyText::Center;
 
-    commands.spawn(Camera2dBundle::default());
-    commands
-        .spawn(Text2dBundle {
-            text: Text::from_section("standard 2d text works too", text_style.clone())
-                .with_justify(text_alignment),
-            ..default()
-        })
-        .insert(AnimateRotation);
+    commands.spawn(Camera2d);
+    commands.spawn((
+        Text2d::new("standard 2d text works too"),
+        text_font.clone(),
+		TextColor::WHITE,
+        TextLayout::new_with_justify(text_alignment),
+        AnimateRotation,
+    ));
+
 }
 
 fn animate_rotation(
     time: Res<Time>,
-    mut query: Query<&mut Transform, (With<Text>, With<AnimateRotation>)>,
+    mut query: Query<&mut Transform, (With<Text2d>, With<AnimateRotation>)>,
 ) {
     for mut transform in &mut query {
-        transform.rotation = Quat::from_rotation_z(time.elapsed_seconds_f64().cos() as f32);
+        transform.rotation = Quat::from_rotation_z(time.elapsed_secs_f64().cos() as f32);
     }
 }

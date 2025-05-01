@@ -3,10 +3,9 @@ use std::fmt::Display;
 
 use anyhow::Result;
 use bevy::asset::{
-    Asset, AssetLoader, AsyncReadExt, LoadContext,
+    Asset, AssetLoader, LoadContext,
     io::Reader,
 };
-use bevy::utils::ConditionalSendFuture;
 use bevy::reflect::TypePath;
 
 #[derive(Debug)]
@@ -31,27 +30,25 @@ impl AssetLoader for FontLoader {
     type Settings = ();
     type Error = FontLoaderError;
 
-    fn load<'a>(
-        &'a self,
-        reader: &'a mut Reader,
-        _: &'a Self::Settings,
-        _load_context: &'a mut LoadContext,
-    ) -> impl ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
-        Box::pin(async move {
-            let mut bytes = Vec::new();
-            reader
-                .read_to_end(&mut bytes)
-                .await
-                .expect("unable to read font");
+    async fn load(
+        &self,
+        reader: &mut dyn Reader,
+        _: &Self::Settings,
+        _load_context: &mut LoadContext<'_>,
+    ) -> Result<Self::Asset, Self::Error> {
+        let mut bytes = Vec::new();
+        reader
+            .read_to_end(&mut bytes)
+            .await
+            .expect("unable to read font");
 
-            // ttf fontloading
-            let font = TextMeshFont {
-                ttf_font: ttf2mesh::TTFFile::from_buffer_vec(bytes.clone())
-                    .expect("unable to decode asset"),
-            };
+        // ttf fontloading
+        let font = TextMeshFont {
+            ttf_font: ttf2mesh::TTFFile::from_buffer_vec(bytes.clone())
+                .expect("unable to decode asset"),
+        };
 
-            Ok(font)
-        })
+        Ok(font)
     }
 
     fn extensions(&self) -> &[&str] {

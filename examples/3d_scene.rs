@@ -5,7 +5,6 @@ use bevy_text_mesh::prelude::*;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::Sample4)
         .add_plugins((DefaultPlugins, TextMeshPlugin))
         .add_systems(Startup, (setup, setup_text_mesh.after(setup)))
         .add_systems(Update, (update_text_mesh, rotate_camera))
@@ -77,7 +76,7 @@ fn update_text_mesh(
 ) {
     if timer.timer.tick(time.delta()).just_finished() {
         for mut text_mesh in text_meshes.iter_mut() {
-            let updated_text = format!("Time = {:.3}", time.elapsed_seconds_f64());
+            let updated_text = format!("Time = {:.3}", time.elapsed_secs_f64());
 
             if text_mesh.text != updated_text {
                 text_mesh.text = updated_text;
@@ -88,7 +87,7 @@ fn update_text_mesh(
 
 fn rotate_camera(mut camera: Query<&mut Transform, With<Camera>>, time: Res<Time>) {
     for mut camera in camera.iter_mut() {
-        let angle = time.elapsed_seconds_f64() as f32 / 2. + 1.55 * std::f32::consts::PI;
+        let angle = time.elapsed_secs_f64() as f32 / 2. + 1.55 * std::f32::consts::PI;
 
         let distance = 3.5;
 
@@ -108,25 +107,24 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(5.0, 5.0))),
-        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-        ..Default::default()
-    });
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(Cuboid {
+    commands.spawn((
+        Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(5.0, 5.0)))),
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
+    ));
+    commands.spawn((
+        Mesh3d(meshes.add(Mesh::from(Cuboid {
             half_size: Vec3::new(1.0, 0.5, 1.0),
-        })),
-        material: materials.add(Color::srgb(0.8, 0.7, 0.6)),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..Default::default()
-    });
-    commands.spawn(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
-    });
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..Default::default()
-    });
+        }))),
+        MeshMaterial3d(materials.add(Color::srgb(0.8, 0.7, 0.6))),
+        Transform::from_xyz(0.0, 0.5, 0.0),
+    ));
+    commands.spawn((
+        PointLight::default(),
+        Transform::from_xyz(4.0, 8.0, 4.0),
+    ));
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Msaa::Sample4,
+    ));
 }
