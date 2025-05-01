@@ -31,7 +31,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             TextMeshPlugin,
-            FrameTimeDiagnosticsPlugin,
+            FrameTimeDiagnosticsPlugin::default(),
             LogDiagnosticsPlugin::default(),
         ))
         .register_diagnostic(Diagnostic::new(TEXT_MESH_UPDATES).with_max_history_length(20)) // , "text_mesh_updates", 20))

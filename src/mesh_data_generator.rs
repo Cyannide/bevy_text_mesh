@@ -23,7 +23,7 @@ pub(crate) fn generate_text_mesh(
     font: &mut TTFFile,
     cache: Option<&mut MeshCache>,
 ) -> MeshData {
-    trace!("Generate text mesh: {:?}", text_mesh.text);
+    bevy::log::trace!("Generate text mesh: {:?}", text_mesh.text);
 
     let mut internal_cache;
 
